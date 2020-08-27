@@ -1,0 +1,8 @@
+- platform: wyzesense
+  device: /dev/docker/wyzesense
+- platform: template
+  sensors:
+    frontdoor:
+      friendly_name: "Puerta Entrada"
+      device_class: door
+      value_template: "{{ is_state('binary_sensor.wyzesense_779015eb', 'on') }}"

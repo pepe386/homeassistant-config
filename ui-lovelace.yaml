@@ -1,0 +1,220 @@
+title: Departamento Vista Hermosa
+custom_header:
+  compact_mode: true
+views:
+  - title: Dashboard
+    panel: true
+    cards:
+      - type: 'custom:layout-card'
+        layout: auto
+        max_columns: 3
+        min_columns: 1
+        min_height: 1
+        cards:
+          ###############################
+          ## Columna 1 ##################
+          ###############################
+          - type: vertical-stack
+            cards:
+              - type: entity-filter
+                show_empty: false
+                state_filter: 
+                  - "on"
+                entities:
+                  - entity: binary_sensor.updater
+                    name: "***Actualizacion disponible***"
+                card:
+                  type: glance
+                  show_state: false
+                  show_icon: false
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - person.brenda
+                  - person.pepe
+              - type: 'custom:button-card' 
+                entity: alarm_control_panel.alarma
+                layout: icon_name_state
+                size: 50%
+                color_type: card
+                styles:
+                  grid:
+                    - grid-template-columns: 1fr 5fr
+                  name:
+                    - padding-right: 15%
+                    - font-weight: bold
+                    - font-size: 20px   
+                    - color: black
+                state:
+                  - name: Desactivar Alarma
+                    value: armed_away
+                    icon: 'mdi:lock'
+                    color: rgb(235, 70, 52)
+                    styles:
+                      name:
+                        - color: white
+                  - name: Desactivar Alarma
+                    value: triggered
+                    icon: 'mdi:lock'
+                    color: rgb(235, 70, 52)
+                    styles:
+                      name:
+                        - color: white
+                  - name: Activar Alarma
+                    value: disarmed
+                    icon: 'mdi:lock-open' 
+                    color: rgb(91, 235, 52)
+                tap_action:
+                  action: call-service
+                  service: alarm_control_panel.alarm_disarm
+                  service_data:
+                    entity_id: alarm_control_panel.alarma
+                    code: !secret alarm_code
+                double_tap_action:
+                  action: call-service
+                  service: alarm_control_panel.alarm_arm_away
+                  service_data:
+                    entity_id: alarm_control_panel.alarma
+                    code: !secret alarm_code
+              - type: 'custom:vertical-stack-in-card' 
+                cards:
+                  - type: 'custom:vertical-stack-in-card'
+                    horizontal: true
+                    #title: Sensores
+                    cards:
+                      - type: 'custom:button-card'
+                        color: 'rgb(28, 128, 199)'
+                        entity: binary_sensor.wyzesense_779015eb
+                        name: Puerta de entrada
+                        state:
+                          - name: Puerta Abierta
+                            value: 'on'
+                            icon: 'mdi:door-open'
+                          - name: Puerta Cerrada
+                            value: 'off'
+                            color: grey
+                            icon: 'mdi:door-closed'   
+                      - type: 'custom:button-card'
+                        color: 'rgb(28, 128, 199)'
+                        entity: binary_sensor.wyzesense_778f946a
+                        name: Sensor de movimiento
+                        state:
+                          - name: Movimiento detecado
+                            value: 'on'
+                            icon: 'mdi:run'
+                          - name: Sin movimiento
+                            value: 'off'
+                            color: grey
+                            icon: 'mdi:walk'     
+                  - type: 'custom:vertical-stack-in-card'
+                    horizontal: true
+                    cards:        
+                      - type: 'custom:button-card'  
+                        color: 'rgb(28, 128, 199)'
+                        entity: media_player.tv_departamento
+                        icon: 'mdi:television'
+                        state: 
+                          - name: TV apagada
+                            value: 'off'
+                            color: grey
+                          - name: TV encendida
+                            value: 'on'
+                      - type: "custom:button-card"
+                        color: rgb(28, 128, 199)
+                        entity: climate.aire_acond_habitacion
+                        icon: mdi:air-conditioner
+                        state:
+                          - name: Auto
+                            value: unknown
+                          - name: Apagado
+                            value: "off"
+                            color: grey
+                          - name: Frío
+                            value: cool
+                          - name: Calor
+                            value: heat
+                          - name: Secar
+                            value: dry
+                  - type: 'custom:battery-state-card'
+                    title: false
+                    entities:
+                      - sensor.door_sensor_battery
+                      - sensor.motion_sensor_battery
+                      - sensor.doorbell_sensor_battery    
+          - break
+          ###############################
+          ## Columna 2 ##################
+          ###############################
+          - type: 'custom:vertical-stack-in-card' 
+            cards:
+            - type: picture-entity
+              aspect_ratio: 0%
+              camera_image: camera.camara_exterior
+              entity: camera.camara_exterior
+              show_state: false  
+              show_name: false   
+            - type: picture-glance
+              aspect_ratio: 0%
+              camera_image: camera.camara_interior
+              entities:
+                - entity: binary_sensor.wyzesense_779015eb
+                - entity: binary_sensor.wyzesense_778f946a    
+            - type: history-graph
+              title: 'Monitoreo de ZoneMinder'
+              hours_to_show: 72
+              entities:
+                - binary_sensor.192_168_1_200
+          - break
+          ###############################
+          ## Columna 3 ##################
+          ###############################
+          - type: 'custom:vertical-stack-in-card'
+            title: Aire acondicionado
+            cards:
+              - type: 'custom:simple-thermostat'
+                control:
+                  hvac:
+                    heat_cool:
+                      name: Auto
+                    'off':
+                      name: Apagar
+                entity: climate.aire_acond_habitacion
+                hide:
+                  temperature: true
+                label:
+                  state: Estado
+                  temperature: Temperatura
+                name: false
+                step_size: 1 
+              - type: 'custom:mini-graph-card'
+                entities:
+                  - sensor.xiaomi_temp
+                hours_to_show: 72
+                line_color: cyan
+                name: Temperatura - 3 días
+                height: 62
+                show:
+                  fill: false
+                  labels: true
+              - type: 'custom:mini-graph-card'  
+                aggregate_func: max
+                entities:
+                  - entity: sensor.ac_energy_daily_kwh
+                    name: AC - Consumo de energía
+                group_by: date
+                hours_to_show: 168
+                line_color: cyan
+                lower_bound: 0
+                name: AC - Consumo de energía por día
+                icon: mdi:lightning-bolt
+                points_per_hour: 1
+                height: 62
+                show:
+                  fill: false
+                  graph: bar
+                  labels: true
+                  points: hover
+                  state: true    
+        
+        
+   

@@ -1,0 +1,85 @@
+##########################################################################################
+###         Automatizaciones cuando tocan el timbre         ##############################
+##########################################################################################
+
+- alias: Notificacion si timbran
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.wyzesense
+    to: 'off'
+  action:
+  - service: camera.snapshot
+    data_template:
+      entity_id: camera.camara_exterior
+      filename: "/config/www/tmp/frontdoor_{{ now ().year }}_{{ now ().month }}_{{ now ().day }}_{{ now ().hour }}_{{ now ().minute }}.jpg"
+  - service: notify.celulares
+    data_template:
+      title: Timbre!
+      message: Alguien llego a la casa
+      data:
+        ttl: 0
+        priority: high
+        channel: Notif
+        vibrationPattern: 100, 1000, 100, 1000
+        #clickAction: /lovelace/
+        clickAction: "{{states('sensor.external_url')}}/local/tmp/frontdoor_{{ now ().year }}_{{ now ().month }}_{{ now ().day }}_{{ now ().hour }}_{{ now ().minute }}.jpg"
+        image: "/local/tmp/frontdoor_{{ now ().year }}_{{ now ().month }}_{{ now ().day }}_{{ now ().hour }}_{{ now ().minute }}.jpg"
+  - delay: '00:01:00'
+  mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+- alias: Camara en tablet si timbran 1
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.wyzesense
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: light.8703c51c_cddde178
+    state: "on"
+  action:
+  - service: browser_mod.more_info
+    data:
+      entity_id: camera.camara_exterior
+      large: true
+      deviceID:
+        - 8703c51c-cddde178
+  - delay: '00:03:00'
+  - service: browser_mod.close_popup
+  - service: browser_mod.lovelace_reload
+    data:
+      deviceID: 8703c51c-cddde178
+  mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+- alias: Camara en tablet si timbran 2
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.wyzesense
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: light.8703c51c_cddde178
+    state: "off"
+  action:
+  - service: browser_mod.no_blackout
+    data:
+      deviceID: 8703c51c-cddde178
+  - service: browser_mod.more_info
+    data:
+      entity_id: camera.camara_exterior
+      large: true
+      deviceID:
+        - 8703c51c-cddde178
+  - delay: '00:03:00'
+  - service: browser_mod.close_popup
+  - service: browser_mod.lovelace_reload
+    data:
+      deviceID: 8703c51c-cddde178
+  mode: single

@@ -1,0 +1,40 @@
+##########################################################################################
+###         Apagado de dispositivos si salimos de casa         ###########################
+##########################################################################################
+
+- alias: Apagar TV
+  description: Apagar tv si salimos de casa
+  trigger:
+  - entity_id: group.someone_home
+    platform: state
+    to: not_home
+  condition:
+  - condition: state
+    entity_id: media_player.tv_departamento
+    state: 'on'
+  action:
+  - data:
+      command: system/turnOff
+      entity_id: media_player.tv_departamento
+    service: webostv.command
+  mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################  
+
+- alias: Apagar AC
+  description: Apagar AC si salimos de casa
+  trigger:
+  - entity_id: group.someone_home
+    platform: state
+    to: not_home
+  condition:
+  - condition: template
+    value_template: '{{states(''climate.aire_acond_habitacion'') != ''off''}}'
+  action:
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.aire_acond_habitacion
+      hvac_mode: 'off'
+  mode: single

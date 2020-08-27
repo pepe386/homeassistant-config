@@ -1,0 +1,63 @@
+##########################################################################################
+###         Automatizaciones de tablet         ###########################################
+##########################################################################################
+
+#Apagar pantalla a las 12am
+- alias: Apagar tablet
+  description: 'Apagar pantalla de tablet a las 12am'
+  trigger:
+  - platform: time
+    at: '00:00:00'
+  condition:
+  - condition: state
+    entity_id: light.8703c51c_cddde178
+    state: "on"
+  action:
+  - service: browser_mod.blackout
+    data:
+      deviceID: 8703c51c-cddde178
+  mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+#si la pantalla se enciende entre 12am y 8am.. esperar 5 minutos y despues apagarla
+- alias: Apagar tablet 2
+  description: 'Apagar pantalla de tablet entre 12am y 8am'
+  trigger:
+  - platform: state
+    entity_id: light.8703c51c_cddde178
+    to: "on"
+  condition: 
+  - condition: time
+    before: '08:00:00'
+  action:
+  - delay: '00:05:00'
+  - service: browser_mod.blackout
+    data:
+      deviceID: 8703c51c-cddde178
+  mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+#encender la pantalla a las 8am y hacer lovelace reload
+- alias: Encender tablet
+  description: 'Encender pantalla de tablet a las 8am'
+  trigger:
+  - platform: time
+    at: '08:00:00'
+  condition:
+  - condition: state
+    entity_id: light.8703c51c_cddde178
+    state: "off"
+  action:
+  - service: browser_mod.no_blackout
+    data:
+      deviceID: 8703c51c-cddde178
+  - service: browser_mod.lovelace_reload
+    data:
+      deviceID: 8703c51c-cddde178
+  mode: single

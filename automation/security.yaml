@@ -1,0 +1,172 @@
+##########################################################################################
+###         Automatizaciones de sistema de seguridad         #############################
+##########################################################################################
+
+- alias: Disparo de alarma por sensores
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.wyzesense_779015eb
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.wyzesense_778f946a
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.alarma
+    state: armed_away
+  action:
+    service: alarm_control_panel.alarm_trigger
+    entity_id: alarm_control_panel.alarma
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+- alias: Alarma disparada
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.alarma
+    to: triggered
+  action:
+  - service: zoneminder.set_run_state
+    data:
+      id: 192.168.1.200
+      name: Alarma activada   
+  - service: tts.google_translate_say
+    data:
+      entity_id: media_player.mpd
+      message: 'Alarma activada. Favor de desactivarla mediante el celular o ipad.'
+      language: 'es'
+  - service: camera.snapshot
+    data_template:
+      entity_id: camera.camara_interior
+      filename: "/config/www/tmp/inside_{{ now ().year }}_{{ now ().month }}_{{ now ().day }}_{{ now ().hour }}_{{ now ().minute }}.jpg"
+  - service: notify.celulares
+    data_template:
+      title: Alarma!
+      message: Se detectó un intruso!
+      data:
+        ttl: 0
+        priority: high
+        channel: AlarmaCagona
+        vibrationPattern: 100, 2000, 100, 2000, 100, 2000, 100, 2000, 100, 15000
+        persistent: true
+        tag: persistent
+        #clickAction: /lovelace/
+        clickAction: "{{states('sensor.external_url')}}/local/tmp/inside_{{ now ().year }}_{{ now ().month }}_{{ now ().day }}_{{ now ().hour }}_{{ now ().minute }}.jpg"
+        image: "/local/tmp/inside_{{ now ().year }}_{{ now ().month }}_{{ now ().day }}_{{ now ().hour }}_{{ now ().minute }}.jpg"
+
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+- alias: Alarma desactivada
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.alarma
+    to: disarmed
+  condition:
+  - condition: template
+    value_template: '{{states(''sensor.run_state'') != ''Alarma desactivada''}}'
+  action:
+  - service: zoneminder.set_run_state
+    data:
+      id: 192.168.1.200
+      name: Alarma desactivada
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+- alias: Activar alarma si salimos de casa
+  trigger:
+  - entity_id: group.someone_home
+    platform: state
+    to: not_home
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.alarma
+    state: disarmed
+  action:
+  - service: alarm_control_panel.alarm_arm_away
+    data:
+      entity_id: alarm_control_panel.alarma
+      code: !secret alarm_code
+  mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################  
+
+- alias: Desactivar alarma si regresamos a casa
+  trigger:
+  - entity_id: group.someone_home
+    platform: state
+    to: home
+  condition:
+  - condition: template
+    value_template: '{{states(''alarm_control_panel.alarma'') != ''disarmed''}}'
+  action:
+  - service: alarm_control_panel.alarm_disarm
+    data:
+      entity_id: alarm_control_panel.alarma
+      code: !secret alarm_code
+  mode: single
+
+##########################################################################################
+##########################################################################################
+########################################################################################## 
+
+- alias: Notificar puerta abierta
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.frontdoor
+    to: 'on'
+    for:
+        minutes: 5
+  condition:
+  - condition: state
+    entity_id: group.someone_home
+    state: home
+  action: 
+  - service: notify.celulares
+    data_template:
+      title: Puerta abierta!
+      message: La puerta de la entrada está abierta.
+      data:
+        ttl: 0
+        priority: high
+        channel: Notif
+        vibrationPattern: 100, 1000, 100, 1000
+  - service: tts.google_translate_say
+    data:
+      entity_id: media_player.mpd
+      message: 'La puerta de la entrada está abierta, favor de cerrarla.'
+      language: 'es'
+
+##########################################################################################
+##########################################################################################
+########################################################################################## 
+
+- alias: Notificar puerta abierta 2
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.frontdoor
+    to: 'on'
+    for:
+        minutes: 5
+  condition:
+  - condition: state
+    entity_id: group.someone_home
+    state: not_home
+  action: 
+  - service: notify.celulares
+    data_template:
+      title: Puerta abierta!
+      message: La puerta de la entrada está abierta.
+      data:
+        ttl: 0
+        priority: high
+        channel: Notif
+        vibrationPattern: 100, 1000, 100, 1000

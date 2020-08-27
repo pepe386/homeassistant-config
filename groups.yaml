@@ -1,0 +1,5 @@
+someone_home:
+    name: Gente en Casa
+    entities:
+      - person.brenda
+      - person.pepe

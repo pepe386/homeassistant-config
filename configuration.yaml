@@ -1,0 +1,165 @@
+homeassistant:
+  name: !secret homeassistant_name
+  latitude: !secret latitude
+  longitude: !secret longitude
+  elevation: !secret elevation
+  unit_system: metric
+  time_zone: !secret time_zone
+  external_url: !secret external_url
+  internal_url: "http://192.168.1.200:8123"
+  customize: !include customize.yaml
+
+person:
+  - name: !secret person_name_1
+    id: !secret person_id_1
+    user_id: !secret person_user_id_1
+    device_trackers:
+      - device_tracker.galaxy_s9
+      - device_tracker.cel_pepe
+  - name: !secret person_name_2
+    id: !secret person_id_2
+    user_id: !secret person_user_id_2
+    device_trackers:
+      - device_tracker.cel_brenda
+      - device_tracker.cel_brenda_2
+
+lovelace:
+  mode: yaml
+  resources:
+    - type: module
+      url: /hacsfiles/battery-state-card/battery-state-card.js
+    - type: module
+      url: /hacsfiles/button-card/button-card.js
+    - type: js
+      url: /local/community/vertical-stack-in-card/vertical-stack-in-card.js?v=0.3.2
+    - type: module
+      url: /local/community/lovelace-layout-card/layout-card.js
+    - type: module
+      url: /local/community/mini-graph-card/mini-graph-card-bundle.js?v=0.9.4
+    - type: module
+      url: /local/community/simple-thermostat/simple-thermostat.js?v=1=1
+    - type: module
+      url: /local/community/custom-header/custom-header.js?v=0.0.1
+    - type: module
+      url: /browser_mod.js
+    
+  dashboards:
+    lovelace-ipad:
+      mode: yaml
+      filename: ipad.yaml
+      title: Ipad Dashboard
+      icon: mdi:view-dashboard
+      show_in_sidebar: false
+      require_admin: false
+
+http:
+  server_port: 8123
+  #ssl_certificate: /config/ssl/fullchain.cer
+  #ssl_key: !secret ssl_key
+  cors_allowed_origins:
+    - https://google.com
+    - https://www.home-assistant.io
+  ip_ban_enabled: true
+  login_attempts_threshold: 10 
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - 172.16.0.0/12
+    - 192.168.1.200
+
+device_tracker:
+  - platform: bluetooth_tracker
+    interval_seconds: 5
+    consider_home: 120
+  - platform: ping
+    interval_seconds: 5
+    consider_home: 120
+    hosts:
+      cel_pepe: 192.168.1.138
+      cel_brenda: 192.168.1.134
+
+alarm_control_panel:
+  - platform: manual
+    name: Alarma
+    code: !secret alarm_code
+    arming_time: 20
+    delay_time: 20
+    trigger_time: 900
+    disarmed:
+      trigger_time: 0
+    armed_away:
+      arming_time: 0
+      delay_time: 0
+
+zoneminder:
+  - host: 192.168.1.200
+    path: /zm/
+    username: !secret zm_user
+    password: !secret zm_pass
+
+camera:
+    - platform: ffmpeg
+      name: 'Camara Interior'
+      input: !secret cam_interior
+    - platform: generic
+      still_image_url: http://192.168.1.76/cgi-bin/snapshot.cgi
+      stream_source: !secret cam_exterior
+      name: 'Camara Exterior'
+      username: !secret cam_exterior_user
+      password: !secret cam_exterior_pass
+      authentication: digest
+
+webostv:
+  host: 192.168.1.89
+  name: TV Departamento
+  customize:
+    sources:
+      - AV
+      - HDMI 2
+      - HDMI 3
+      - HDMI 4
+      - Live TV
+      - pc
+      - Netflix
+
+utility_meter:
+  ac_energy_hourly:
+    source: sensor.ac_energy_value
+    cycle: hourly
+  ac_energy_daily:
+    source: sensor.ac_energy_value
+    cycle: daily
+  ac_energy_daily_kwh:
+    source: sensor.ac_energy_value_kwh
+    cycle: daily
+  ac_energy_weekly_kwh:
+    source: sensor.ac_energy_value_kwh
+    cycle: weekly
+
+notify:
+  - name: celulares
+    platform: group
+    services:
+      - service: mobile_app_sm_g9650
+      - service: mobile_app_sm_g9650_2
+
+browser_mod:
+
+media_player:
+  - platform: mpd
+    host: 192.168.1.200
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+    base_url: !secret external_url
+
+group: !include groups.yaml
+automation: !include_dir_merge_list automation
+sensor: !include sensors.yaml
+binary_sensor: !include binary_sensors.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

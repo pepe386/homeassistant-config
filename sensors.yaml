@@ -1,0 +1,31 @@
+- platform: zoneminder
+  include_archived: false
+- platform: template
+  sensors:
+    external_url: 
+      value_template: !secret external_url
+    in_temp:
+      friendly_name: "Temperatura"
+      unit_of_measurement: '°C'
+      value_template: "{{states.climate.aire_acond_habitacion.attributes.current_temperature}}"
+    door_sensor_battery:
+      friendly_name: "Batería Sensor Puerta"
+      unit_of_measurement: '%'
+      value_template: "{{states.binary_sensor.wyzesense_779015eb.attributes.battery_level}}"
+    motion_sensor_battery:
+      friendly_name: "Batería Sensor Movimiento"
+      unit_of_measurement: '%'
+      value_template: "{{states.binary_sensor.wyzesense_778f946a.attributes.battery_level}}"
+    doorbell_sensor_battery:
+      friendly_name: "Batería Sensor Timbre"
+      unit_of_measurement: '%'
+      value_template: "{{states.binary_sensor.wyzesense.attributes.battery_level}}"
+    ac_energy_value:
+      friendly_name: "Consumo de energía AC"
+      unit_of_measurement: 'Wh'
+      value_template: "{{states.climate.aire_acond_habitacion.attributes.power_consumption_energy}}"
+    ac_energy_value_kwh:
+      friendly_name: "Consumo de energía AC en kwH"
+      unit_of_measurement: 'kWh'
+      value_template: "{{states.climate.aire_acond_habitacion.attributes.power_consumption_energy / 1000}}"
+      
