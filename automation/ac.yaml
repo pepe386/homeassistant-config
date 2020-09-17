@@ -6,7 +6,7 @@
   description: 'Encender AC si hace calor y hay alguien en casa'
   trigger:
   - platform: template
-    value_template: '{{states(''sensor.xiaomi_temp'')|float > 25.9 }}'
+    value_template: '{{states(''sensor.xiaomi_temp'')|float > 26.8 }}'
   condition:
   - condition: and
     conditions:
@@ -20,7 +20,7 @@
   - service: climate.set_hvac_mode
     data:
       entity_id: climate.aire_acond_habitacion
-      hvac_mode: heat_cool
+      hvac_mode: cool
   mode: single
 
 ##########################################################################################
@@ -40,12 +40,12 @@
       entity_id: climate.aire_acond_habitacion
       state: 'off'
     - condition: template
-      value_template: '{{states(''sensor.xiaomi_temp'')|float > 25.9 }}'
+      value_template: '{{states(''sensor.xiaomi_temp'')|float > 26.8 }}'
   action:
   - service: climate.set_hvac_mode
     data:
       entity_id: climate.aire_acond_habitacion
-      hvac_mode: heat_cool
+      hvac_mode: cool
   mode: single
 
 ##########################################################################################
