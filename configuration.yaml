@@ -149,6 +149,27 @@ media_player:
   - platform: mpd
     host: 192.168.1.200
 
+discovery:
+  ignore:
+    - yeelight
+yeelight:
+  devices:
+    192.168.1.108:
+      name: Lampara de Cama
+      #use_music_mode: true
+      model: 'bslamp1'
+  custom_effects:        
+  - name: 'Sunrise'
+    flow_params:
+      count: 1
+      transitions:
+      - RGBTransition: [255, 0, 0, 50, 1]
+      - TemperatureTransition: [1700, 360000, 10]
+      - TemperatureTransition: [2700, 360000, 11]
+      - TemperatureTransition: [3700, 360000, 12]
+      - TemperatureTransition: [4700, 360000, 13]
+      - TemperatureTransition: [6500, 360000, 100]
+
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
