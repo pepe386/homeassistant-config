@@ -1,0 +1,20 @@
+- name: Sunrise
+  entities:
+    light.lampara:
+      state: "on"
+      effect: Sunrise
+
+- name: Lights Off
+  entities:
+    light.recamara: "off"
+    light.exterior: "off"
+    light.lampara: "off"
+
+- name: Night
+  entities:
+    light.exterior:
+      state: "on"
+      brightness: 3
+    light.recamara:
+      state: "off"
+      

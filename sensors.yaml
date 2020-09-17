@@ -1,5 +1,8 @@
 - platform: zoneminder
   include_archived: false
+- platform: time_date
+  display_options:
+    - 'time'
 - platform: template
   sensors:
     external_url: 
@@ -28,4 +31,38 @@
       friendly_name: "Consumo de energía AC en kwH"
       unit_of_measurement: 'kWh'
       value_template: "{{states.climate.aire_acond_habitacion.attributes.power_consumption_energy / 1000}}"
-      
+    despertador_brenda:
+      friendly_name: "Despertador cel Brenda"
+      value_template: >
+        {% if is_state('sensor.sm_g9650_2_next_alarm', 'unavailable') %}
+        {{ 4102444800 | timestamp_local }}
+        {% else %}
+        {{ states('sensor.sm_g9650_2_next_alarm') }}
+        {% endif %}
+    despertador_pepe:
+      friendly_name: "Despertador cel Pepe"
+      value_template: >
+        {% if is_state('sensor.sm_g9650_2_next_alarm_2', 'unavailable') %}
+        {{ 4102444800 | timestamp_local }}
+        {% else %}
+        {{ states('sensor.sm_g9650_2_next_alarm_2') }}
+        {% endif %}
+    siguiente_despertador:
+      friendly_name: "Siguiente despertador"
+      value_template: >
+        {% if is_state('group.someone_home', 'not_home') %}
+          {{ 4102444800 | timestamp_local }}
+        {% else %}
+          {% if ( is_state('person.brenda', 'home') and is_state('person.pepe', 'not_home') ) %}
+            {{ states('sensor.despertador_brenda') }}
+          {% endif %}
+          {% if ( is_state('person.pepe', 'home') and is_state('person.brenda', 'not_home') ) %}
+            {{ states('sensor.despertador_pepe') }}
+          {% endif %}
+          {% if ( is_state('person.brenda', 'home') and (as_timestamp(states('sensor.despertador_brenda')) < as_timestamp(states('sensor.despertador_pepe'))) ) %}
+            {{ states('sensor.despertador_brenda') }}
+          {% endif %}
+          {% if ( is_state('person.pepe', 'home') and (as_timestamp(states('sensor.despertador_pepe')) < as_timestamp(states('sensor.despertador_brenda'))) ) %}
+            {{ states('sensor.despertador_pepe') }}
+          {% endif %}
+        {% endif %}
