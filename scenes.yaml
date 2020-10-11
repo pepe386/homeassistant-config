@@ -7,14 +7,17 @@
 - name: Lights Off
   entities:
     light.recamara: "off"
-    light.exterior: "off"
     light.lampara: "off"
+    light.lampara_cama_pepe: "off"
+    light.cocina: "off"
 
 - name: Night
   entities:
-    light.exterior:
+    light.lampara_cama_pepe:
       state: "on"
-      brightness: 3
+      brightness: 4
+      kelvin: 2700
     light.recamara:
       state: "off"
-      
+    light.cocina:
+      state: "off"
