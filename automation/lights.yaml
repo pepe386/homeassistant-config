@@ -1,0 +1,210 @@
+##########################################################################################
+###         Automatizaciones para iluminacion         ####################################
+##########################################################################################
+
+- alias: Encender lampara con despertador
+  trigger:
+  - platform: state
+    entity_id: sensor.time
+  condition:
+  - condition: and
+    conditions:
+    - condition: time
+      before: '10:00:00'
+    - condition: template
+      value_template: >
+        {{ as_timestamp(states("sensor.siguiente_despertador")) - as_timestamp(now()) < 90 }}
+  action:
+  - service: scene.turn_on
+    data:
+      entity_id: scene.sunrise
+  - service: script.wakeup
+  - delay: '00:30:00'
+  - service: light.turn_on
+    data:
+      entity_id: light.recamara
+      brightness_pct: 70
+  - service: yeelight.set_color_temp_scene
+    data:
+      entity_id: light.lampara
+      kelvin: 6500
+      brightness: 100
+  - delay: '02:00:00'
+  mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+- alias: Activar modo moonlight en lamapara de cama
+  trigger:
+  - platform: event
+    event_type: call_service
+    event_data:
+      service_data:
+        entity_id: scene.night
+      domain: scene
+      service: turn_on
+  action:
+  - service: yeelight.set_mode
+    data:
+      entity_id: light.lampara
+      mode: moonlight
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+#Dimmer Recamara
+
+- alias: 'Encender luces recamara normal'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_recamara
+      event: 1002
+  action:
+  - service: light.toggle
+    data:
+      entity_id:
+        - light.recamara
+      brightness_pct: 70
+
+- alias: 'Encender luces recamara alta intensidad'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_recamara
+      event: 1001
+  action:
+  - service: light.toggle
+    data:
+      entity_id:
+        - light.recamara
+      brightness_pct: 100
+
+- alias: 'Aumentar brillo luces recamara'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_recamara
+      event: 2002
+  action:
+  - service: deconz.configure
+    data:
+      entity: light.recamara
+      field: "/action"
+      data: {"bri":215}
+
+- alias: 'Bajar brillo luces recamara'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_recamara
+      event: 3002
+  action:
+  - service: deconz.configure
+    data:
+      entity: light.recamara
+      field: "/action"
+      data: {"bri":2}
+
+- alias: 'Apagar luces recamara'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_recamara
+      event: 4002
+  action:
+  - service: light.toggle
+    entity_id:
+        - light.recamara
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+#Dimmer Cocina
+
+- alias: 'Encender luces cocina normal'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_cocina
+      event: 1002
+  action:
+  - service: light.toggle
+    data:
+      entity_id:
+        - light.cocina
+      brightness_pct: 70
+
+- alias: 'Encender luces cocina alta intensidad'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_cocina
+      event: 1001
+  action:
+  - service: light.toggle
+    data:
+      entity_id:
+        - light.cocina
+      brightness_pct: 100
+
+- alias: 'Aumentar brillo luces cocina'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_cocina
+      event: 2002
+  action:
+  - service: deconz.configure
+    data:
+      entity: light.cocina
+      field: "/action"
+      data: {"bri":240}
+
+- alias: 'Bajar brillo luces cocina'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_cocina
+      event: 3002
+  action:
+  - service: deconz.configure
+    data:
+      entity: light.cocina
+      field: "/action"
+      data: {"bri":2}
+
+- alias: 'Apagar luces cocina'
+  initial_state: 'on'
+  trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      id: switch_cocina
+      event: 4002
+  action:
+  - service: light.toggle
+    entity_id:
+        - light.cocina

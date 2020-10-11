@@ -38,3 +38,18 @@
       entity_id: climate.aire_acond_habitacion
       hvac_mode: 'off'
   mode: single
+
+##########################################################################################
+##########################################################################################
+##########################################################################################  
+- alias: Apagar Luces
+  description: Apagar luces si salimos de casa
+  trigger:
+  - entity_id: group.someone_home
+    platform: state
+    to: not_home
+  action:
+  - service: scene.turn_on
+    data:
+      entity_id: scene.lights_off
+  mode: single
