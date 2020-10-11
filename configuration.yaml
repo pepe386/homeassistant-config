@@ -27,22 +27,21 @@ lovelace:
   mode: yaml
   resources:
     - type: module
+      url: /local/community/lovelace-layout-card/layout-card.js
+    - type: module
       url: /hacsfiles/battery-state-card/battery-state-card.js
     - type: module
       url: /hacsfiles/button-card/button-card.js
     - type: js
       url: /local/community/vertical-stack-in-card/vertical-stack-in-card.js?v=0.3.2
     - type: module
-      url: /local/community/lovelace-layout-card/layout-card.js
-    - type: module
       url: /local/community/mini-graph-card/mini-graph-card-bundle.js?v=0.9.4
     - type: module
       url: /local/community/simple-thermostat/simple-thermostat.js?v=1=1
     - type: module
-      url: /local/community/custom-header/custom-header.js?v=0.0.1
+      url: /local/community/lovelace-card-mod/card-mod.js
     - type: module
       url: /browser_mod.js
-    
   dashboards:
     lovelace-ipad:
       mode: yaml
@@ -158,7 +157,7 @@ yeelight:
       name: Lampara de Cama
       #use_music_mode: true
       model: 'bslamp1'
-  custom_effects:        
+  custom_effects:
   - name: 'Sunrise'
     flow_params:
       count: 1
@@ -169,6 +168,9 @@ yeelight:
       - TemperatureTransition: [3700, 360000, 12]
       - TemperatureTransition: [4700, 360000, 13]
       - TemperatureTransition: [6500, 360000, 100]
+
+frontend:
+  themes: !include_dir_merge_named themes/
 
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
