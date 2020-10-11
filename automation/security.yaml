@@ -66,9 +66,9 @@
   - platform: state
     entity_id: alarm_control_panel.alarma
     to: disarmed
-  condition:
-  - condition: template
-    value_template: '{{states(''sensor.run_state'') != ''Alarma desactivada''}}'
+  #condition:
+  #- condition: template
+  #  value_template: '{{states(''sensor.run_state'') != ''Alarma desactivada''}}'
   action:
   - service: zoneminder.set_run_state
     data:
