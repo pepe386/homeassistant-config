@@ -1,16 +1,17 @@
 title: Departamento Vista Hermosa
-custom_header:
-  compact_mode: true
 views:
   - title: Dashboard
+    icon: mdi:view-dashboard
     panel: true
     cards:
-      - type: 'custom:layout-card'
-        layout: auto
-        max_columns: 3
-        min_columns: 1
-        min_height: 1
+      - type: vertical-stack #workaround to fix issues with 0.116
         cards:
+        - type: 'custom:layout-card'
+          layout: auto
+          max_columns: 3
+          min_columns: 1
+          min_height: 1
+          cards:
           ###############################
           ## Columna 1 ##################
           ###############################
@@ -76,7 +77,7 @@ views:
                   service_data:
                     entity_id: alarm_control_panel.alarma
                     code: !secret alarm_code
-              - type: 'custom:vertical-stack-in-card' 
+              - type: 'custom:vertical-stack-in-card'
                 cards:
                   - type: 'custom:vertical-stack-in-card'
                     horizontal: true
@@ -93,7 +94,7 @@ views:
                           - name: Puerta Cerrada
                             value: 'off'
                             color: grey
-                            icon: 'mdi:door-closed'   
+                            icon: 'mdi:door-closed'
                       - type: 'custom:button-card'
                         color: 'rgb(28, 128, 199)'
                         entity: binary_sensor.wyzesense_778f946a
@@ -145,76 +146,113 @@ views:
           ###############################
           ## Columna 2 ##################
           ###############################
-          - type: 'custom:vertical-stack-in-card' 
+          - type: vertical-stack #workaround to fix issues with 0.116
             cards:
-            - type: picture-entity
-              aspect_ratio: 0%
-              camera_image: camera.camara_exterior
-              entity: camera.camara_exterior
-              show_state: false  
-              show_name: false   
-            - type: picture-glance
-              aspect_ratio: 0%
-              camera_image: camera.camara_interior
-              entities:
-                - entity: binary_sensor.wyzesense_779015eb
-                - entity: binary_sensor.wyzesense_778f946a    
-            - type: history-graph
-              title: 'Monitoreo de ZoneMinder'
-              hours_to_show: 72
-              entities:
-                - binary_sensor.192_168_1_200
+            - type: 'custom:vertical-stack-in-card' 
+              cards:
+              - type: vertical-stack
+                cards:
+                - type: picture-entity
+                  aspect_ratio: 0%
+                  camera_image: camera.camara_exterior
+                  entity: camera.camara_exterior
+                  show_state: false  
+                  show_name: false   
+                - type: picture-glance
+                  aspect_ratio: 0%
+                  camera_image: camera.camara_interior
+                  entities:
+                    - entity: binary_sensor.wyzesense_779015eb
+                    - entity: binary_sensor.wyzesense_778f946a    
+                - type: history-graph
+                  title: 'Monitoreo de ZoneMinder'
+                  hours_to_show: 72
+                  entities:
+                    - binary_sensor.192_168_1_200
           - break
           ###############################
           ## Columna 3 ##################
           ###############################
-          - type: 'custom:vertical-stack-in-card'
-            title: Aire acondicionado
-            cards:
-              - type: 'custom:simple-thermostat'
-                control:
-                  hvac:
-                    heat_cool:
-                      name: Auto
-                    'off':
-                      name: Apagar
-                entity: climate.aire_acond_habitacion
-                hide:
-                  temperature: true
-                label:
-                  state: Estado
-                  temperature: Temperatura
-                name: false
-                step_size: 1 
-              - type: 'custom:mini-graph-card'
-                entities:
-                  - sensor.xiaomi_temp
-                hours_to_show: 72
-                line_color: cyan
-                name: Temperatura - 3 días
-                height: 62
-                show:
-                  fill: false
-                  labels: true
-              - type: 'custom:mini-graph-card'  
-                aggregate_func: max
-                entities:
-                  - entity: sensor.ac_energy_daily_kwh
-                    name: AC - Consumo de energía
-                group_by: date
-                hours_to_show: 168
-                line_color: cyan
-                lower_bound: 0
-                name: AC - Consumo de energía por día
-                icon: mdi:lightning-bolt
-                points_per_hour: 1
-                height: 62
-                show:
-                  fill: false
-                  graph: bar
-                  labels: true
-                  points: hover
-                  state: true    
-        
-        
-   
+          - type: vertical-stack #workaround to fix issues with 0.116
+            cards: 
+            - type: 'custom:vertical-stack-in-card'
+              title: Aire acondicionado
+              cards:
+                - type: 'custom:simple-thermostat'
+                  control:
+                    hvac:
+                      heat_cool:
+                        name: Auto
+                      'off':
+                        name: Apagar
+                  entity: climate.aire_acond_habitacion
+                  hide:
+                    temperature: true
+                  label:
+                    state: Estado
+                    temperature: Temperatura
+                  name: false
+                  step_size: 1 
+                - type: 'custom:mini-graph-card'
+                  entities:
+                    - sensor.xiaomi_temp
+                  hours_to_show: 72
+                  line_color: cyan
+                  name: Temperatura - 3 días
+                  height: 62
+                  show:
+                    fill: false
+                    labels: true
+                - type: 'custom:mini-graph-card'  
+                  aggregate_func: max
+                  entities:
+                    - entity: sensor.ac_energy_daily_kwh
+                      name: AC - Consumo de energía
+                  group_by: date
+                  hours_to_show: 168
+                  line_color: cyan
+                  lower_bound: 0
+                  name: AC - Consumo de energía por día
+                  icon: mdi:lightning-bolt
+                  points_per_hour: 1
+                  height: 62
+                  show:
+                    fill: false
+                    graph: bar
+                    labels: true
+                    points: hover
+                    state: true    
+  - title: Iluminacion
+    icon: mdi:lightbulb   
+    cards: 
+      - type: glance
+        show_state: false
+        entities:
+          - entity: scene.night
+            icon: 'mdi:weather-night'
+            name: 'Modo Noche'
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.night
+          - entity: scene.lights_off
+            icon: 'mdi:lightbulb-outline'
+            name: 'Apagar luces'
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.lights_off
+      - type: light
+        entity: light.recamara
+      - type: light
+        entity: light.cocina
+      - type: light
+        entity: light.lampara
+        name: "Lampara de Cama Brenda"
+      - type: light
+        entity: light.lampara_cama_pepe
+        name: "Lampara de Cama Pepe"
+      - type: light
+        entity: light.exterior
